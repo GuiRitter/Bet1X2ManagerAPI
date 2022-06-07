@@ -7,6 +7,5 @@ import { getList } from '../controller/projectController';
 const router = express.Router();
 
 router.get('/list', verifyAuth, getList);
-// router.post('/step', verifyAuth, setStep);
 
 export default router;

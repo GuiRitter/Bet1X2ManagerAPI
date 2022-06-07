@@ -13,7 +13,7 @@ import {
 } from '../helper/status';
 
 export const signIn = async (req, res) => {
-	const { login, password } = req.query;
+	const { login, password } = req.body;
 	if (!isNonEmptyString(login)) {
 		errorMessage.error = 'Invalid login.';
 		return res.status(status.bad).send(errorMessage);
