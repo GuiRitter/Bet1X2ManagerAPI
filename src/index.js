@@ -3,7 +3,6 @@ import express from 'express';
 import 'babel-polyfill';
 import cors from 'cors';
 
-
 import betRoute from './app/route/betRoute';
 import projectRoute from './app/route/projectRoute';
 import userRoute from './app/route/userRoute';

@@ -9,4 +9,3 @@ const router = express.Router();
 router.get('/list', verifyAuth, getList);
 
 export default router;
-
