@@ -7,7 +7,7 @@ import {
 
 export const getList = async (req, res) => {
 	const { projectId } = req.query;
-	const query = 'SELECT project, date_time, host, guest, odd, bet, expected_result, actual_result, bet_sum, bet_total, prize_total FROM bet WHERE project = $1 ORDER BY date_time DESC';
+	const query = 'SELECT project, date_time, home, away, odd, bet, expected_result, actual_result, bet_sum, bet_total, prize_total FROM bet WHERE project = $1 ORDER BY date_time DESC';
 	try {
 		const { rows } = await dbQuery.query(query, [projectId]);
 		return res.status(status.success).send(rows);
