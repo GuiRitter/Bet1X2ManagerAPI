@@ -2,11 +2,11 @@ import express from 'express';
 
 import verifyAuth from '../middleware/verifyAuth';
 
-import { getList, postStart } from '../controller/betController';
+import { getList, place } from '../controller/betController';
 
 const router = express.Router();
 
 router.get('/list', verifyAuth, getList);
-router.post('/start', verifyAuth, postStart);
+router.post('/place', verifyAuth, place);
 
 export default router;

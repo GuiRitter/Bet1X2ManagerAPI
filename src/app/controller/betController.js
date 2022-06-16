@@ -22,11 +22,21 @@ export const getList = async (req, res) => {
 	}
 };
 
-export const postStart = async (req, res) => {
+export const place = async (req, res) => {
 	const { projectId, dateTime, home, away, expectedResult, odd, bet } = req.body;
-	log('postStart', { projectId, dateTime, home, away, expectedResult, odd, bet });
+	log('place', { projectId, dateTime, home, away, expectedResult, odd, bet });
 	const query = `INSERT INTO bet (project, date_time, home, away, expected_result, odd, bet, actual_result, bet_sum, bet_total, prize_total)${'\n'
-		}SELECT $1, $2, $3, $4, $5, $6, $7, NULL, $7, bet_total + $7, prize_total${'\n'
+		}SELECT $1${'\n' // project
+		}, $2${'\n' // date_time
+		}, $3${'\n' // home
+		}, $4${'\n' // away
+		}, $5${'\n' // expected_result
+		}, $6${'\n' // odd
+		}, $7${'\n' // bet
+		}, NULL${'\n' // actual_result
+		}, $7 + (CASE WHEN expected_result = actual_result THEN 0 ELSE bet_sum END)${'\n' // bet_sum
+		}, bet_total + $7${'\n' // bet_total
+		}, prize_total${'\n' // prize_total
 		}FROM bet${'\n'
 		}WHERE project = $1${'\n'
 		}ORDER BY date_time DESC${'\n'
@@ -35,10 +45,10 @@ export const postStart = async (req, res) => {
 	try {
 		const result = await dbQuery.query(query, [projectId, dateTime, home, away, expectedResult, odd, bet]);
 		const rows = result.rows;
-		log('postStart', { result });
+		log('place', { result });
 		return res.status(status.success).send(rows);
 	} catch (error) {
-		log('postStart', { error });
+		log('place', { error });
 		if (error) {
 			if (error.message) {
 				errorMessage.error = error.message;
