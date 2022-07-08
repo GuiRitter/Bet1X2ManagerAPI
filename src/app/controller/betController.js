@@ -14,7 +14,7 @@ export const close = async (req, res) => {
 	log('close', { projectId, actualResult });
 	const query = `UPDATE bet${'\n'
 		}SET actual_result = $2,${'\n'
-		}prize_total = prize_total + (CASE WHEN expected_result = $2 THEN ROUND(odd * bet, 2) ELSE 0 END)${'\n'
+		}prize_total = prize_total + (CASE WHEN expected_result = $2 THEN prize ELSE 0 END)${'\n'
 		}WHERE project = $1${'\n'
 		}AND actual_result IS NULL${'\n'
 		}RETURNING *;`;
@@ -54,9 +54,9 @@ export const getList = async (req, res) => {
 };
 
 export const place = async (req, res) => {
-	const { projectId, dateTime, home, away, expectedResult, odd, bet } = req.body;
-	log('place', { projectId, dateTime, home, away, expectedResult, odd, bet });
-	const query = `INSERT INTO bet (project, date_time, home, away, expected_result, odd, bet, actual_result, bet_sum, bet_total, prize_total)${'\n'
+	const { projectId, dateTime, home, away, expectedResult, odd, bet, prize } = req.body;
+	log('place', { projectId, dateTime, home, away, expectedResult, odd, bet, prize });
+	const query = `INSERT INTO bet (project, date_time, home, away, expected_result, odd, bet, prize, actual_result, bet_sum, bet_total, prize_total)${'\n'
 		}SELECT $1${'\n' // project
 		}, $2${'\n' // date_time
 		}, $3${'\n' // home
@@ -64,6 +64,7 @@ export const place = async (req, res) => {
 		}, $5${'\n' // expected_result
 		}, $6${'\n' // odd
 		}, $7${'\n' // bet
+		}, $8${'\n' // prize
 		}, NULL${'\n' // actual_result
 		}, $7 + (CASE WHEN expected_result = actual_result THEN 0 ELSE bet_sum END)${'\n' // bet_sum
 		}, bet_total + $7${'\n' // bet_total
@@ -82,7 +83,7 @@ export const place = async (req, res) => {
 		}LIMIT 1${'\n'
 		}RETURNING *;`;
 	try {
-		const result = await dbQuery.query(query, [projectId, dateTime, home, away, expectedResult, odd, bet]);
+		const result = await dbQuery.query(query, [projectId, dateTime, home, away, expectedResult, odd, bet, prize]);
 		const rows = result.rows;
 		log('place', { result });
 		return res.status(status.success).send(rows);
