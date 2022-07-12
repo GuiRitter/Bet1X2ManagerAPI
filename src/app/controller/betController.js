@@ -14,7 +14,9 @@ export const close = async (req, res) => {
 	log('close', { projectId, actualResult });
 	const query = `UPDATE bet${'\n'
 		}SET actual_result = $2,${'\n'
-		}prize_total = prize_total + (CASE WHEN expected_result = $2 THEN prize ELSE 0 END)${'\n'
+		}bet_sum = bet_sum - (CASE WHEN SUBSTRING($2, 2, 1) = 'R' THEN bet ELSE 0 END),${'\n'
+		}bet_total = bet_total - (CASE WHEN SUBSTRING($2, 2, 1) = 'R' THEN bet ELSE 0 END),${'\n'
+		}prize_total = prize_total + (CASE WHEN expected_result = SUBSTRING($2, 1, 1) THEN prize ELSE 0 END)${'\n'
 		}WHERE project = $1${'\n'
 		}AND actual_result IS NULL${'\n'
 		}RETURNING *;`;
@@ -66,7 +68,7 @@ export const place = async (req, res) => {
 		}, $7${'\n' // bet
 		}, $8${'\n' // prize
 		}, NULL${'\n' // actual_result
-		}, $7 + (CASE WHEN expected_result = actual_result THEN 0 ELSE bet_sum END)${'\n' // bet_sum
+		}, $7 + (CASE WHEN expected_result = SUBSTRING(actual_result, 1, 1) THEN 0 ELSE bet_sum END)${'\n' // bet_sum
 		}, bet_total + $7${'\n' // bet_total
 		}, prize_total${'\n' // prize_total
 		}FROM (${'\n'
