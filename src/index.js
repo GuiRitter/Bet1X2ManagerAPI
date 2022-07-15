@@ -1,6 +1,6 @@
+import '@babel/polyfill';
 import 'dotenv/config'; // always first import
 import express from 'express';
-import 'babel-polyfill';
 import cors from 'cors';
 
 import betRoute from './app/route/betRoute';
