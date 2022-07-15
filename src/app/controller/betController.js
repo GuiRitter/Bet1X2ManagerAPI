@@ -1,6 +1,10 @@
 import dbQuery from '../db/dev/dbQuery';
 
 import {
+	isNonEmptyString
+} from '../helper/validation';
+
+import {
 	errorMessage,
 	status
 } from '../helper/status';
@@ -12,11 +16,15 @@ const log = getLog('betController');
 export const close = async (req, res) => {
 	const { projectId, actualResult } = req.body;
 	log('close', { projectId, actualResult });
+	if (!isNonEmptyString(actualResult)) {
+		errorMessage.error = 'Invalid action result.';
+		return res.status(status.bad).send(errorMessage);
+	}
 	const query = `UPDATE bet${'\n'
-		}SET actual_result = $2,${'\n'
-		}bet_sum = bet_sum - (CASE WHEN SUBSTRING($2, 2, 1) = 'R' THEN bet ELSE 0 END),${'\n'
-		}bet_total = bet_total - (CASE WHEN SUBSTRING($2, 2, 1) = 'R' THEN bet ELSE 0 END),${'\n'
-		}prize_total = prize_total + (CASE WHEN expected_result = SUBSTRING($2, 1, 1) THEN prize ELSE 0 END)${'\n'
+		}SET actual_result = $2::text,${'\n'
+		}bet_sum = bet_sum - (CASE WHEN SUBSTRING($2::text, 2, 1) = 'R' THEN bet ELSE 0 END),${'\n'
+		}bet_total = bet_total - (CASE WHEN SUBSTRING($2::text, 2, 1) = 'R' THEN bet ELSE 0 END),${'\n'
+		}prize_total = prize_total + (CASE WHEN expected_result = SUBSTRING($2::text, 1, 1) THEN prize ELSE 0 END)${'\n'
 		}WHERE project = $1${'\n'
 		}AND actual_result IS NULL${'\n'
 		}RETURNING *;`;
